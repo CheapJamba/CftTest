@@ -3,6 +3,7 @@ package com.bagandov;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,25 +20,31 @@ public class QuantityMatcher {
     }
 
     public QuantityMatcher(String patternString) {
-        if (patternString.length() % 2 != 0) {
-            throw new PatternFormatException("Шаблон, регламентирующий количество символов, содержит нечетное количество символов");
+        if (!patternString.matches("(\\p{javaLetterOrDigit}\\d+)+")) {
+            throw new PatternFormatException("Неверный формат шаблона *символ**количество*");
         }
         this.requirements = new HashMap<>();
-        for (int i = 0; i < patternString.length(); i += 2) {
-            this.requirements.put(patternString.substring(i, i + 1), Integer.parseInt(patternString.substring(i + 1, i + 2)));
+
+        Matcher matcher = Pattern.compile("\\p{javaLetterOrDigit}\\d+").matcher(patternString);
+        while (matcher.find()) {
+            this.requirements.put(matcher.group().substring(0, 1), Integer.parseInt(matcher.group().substring(1)));
         }
     }
 
     public boolean addRequirement(String symbol, Integer quantity) {
-        if (requirements.containsKey(symbol)) {
-            throw new IllegalStateException("Данный Matcher уже содержит требование для символа \"" + symbol + "\" с количеством " + quantity);
-        }
         if (symbol.length() != 1) {
             throw new IllegalArgumentException("Matcher данного типа не поддерживает проверку для строк длиной больше 1");
+        }
+        if (requirements.containsKey(symbol)) {
+            throw new IllegalStateException("Данный Matcher уже содержит требование для символа \"" + symbol + "\" с количеством " + quantity);
         }
 
         requirements.put(symbol, quantity);
         return true;
+    }
+
+    public Set<String> getTargetSymbolsSet() {
+        return requirements.keySet();
     }
 
     public boolean matches(String target) {

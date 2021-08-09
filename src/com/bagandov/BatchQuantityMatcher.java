@@ -12,16 +12,22 @@ public class BatchQuantityMatcher {
 
     private Map<QuantityMatcher, Report> quantityMatchers;
 
+    StringBuilder patternBuilder = new StringBuilder();
+
     public BatchQuantityMatcher() {
         occurrences = new HashMap<>();
         quantityMatchers = new HashMap<>();
+        patternBuilder.append("[]");
     }
 
     public void addPattern(Report report) {
-        String tag = report.getTag();
-        quantityMatchers.put(new QuantityMatcher(tag), report);
-        for (int i = 0; i < tag.length(); i += 2) {
-            this.occurrences.put(tag.substring(i, i + 1), 0);
+        String patternString = report.getPatternString();
+        QuantityMatcher newQMatcher = new QuantityMatcher(patternString);
+        quantityMatchers.put(newQMatcher, report);
+
+        for(String symbol : newQMatcher.getTargetSymbolsSet()) {
+            this.occurrences.put(symbol, 0);
+            patternBuilder.insert(1, symbol);
         }
     }
 
@@ -30,13 +36,6 @@ public class BatchQuantityMatcher {
     }
 
     public void matches(String target) {
-        StringBuilder patternBuilder = new StringBuilder();
-        patternBuilder.append("[");
-        for (String key : occurrences.keySet()) {
-            occurrences.put(key, 0);
-            patternBuilder.append(key);
-        }
-        patternBuilder.append("]");
         Matcher matcher = Pattern.compile(patternBuilder.toString()).matcher(target);
 
         while (matcher.find()) {
@@ -47,6 +46,10 @@ public class BatchQuantityMatcher {
             if(qMatcher.matches(target, occurrences)) {
                 quantityMatchers.get(qMatcher).increment();
             }
+        }
+
+        for(String key : occurrences.keySet()) {
+            occurrences.put(key, 0);
         }
     }
 }

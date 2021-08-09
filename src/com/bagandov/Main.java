@@ -22,7 +22,7 @@ public class Main {
 
 
         Scanner scanner = new Scanner(new FileInputStream(file1));
-        scanner.useDelimiter("[^\\p{L}\\p{Digit}]+");
+        scanner.useDelimiter("[^\\p{javaLetterOrDigit}]+");
 
         List<String> words = new ArrayList<>();
         while (scanner.hasNext()) {

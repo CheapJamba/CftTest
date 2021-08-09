@@ -2,14 +2,14 @@ package com.bagandov;
 
 public class Report {
 
-    private String tag;
+    private String patternString;
 
     private String error;
 
     private int count;
 
-    public Report(String tag) {
-        this.tag = tag;
+    public Report(String patternString) {
+        this.patternString = patternString;
         this.count = 0;
     }
 
@@ -17,8 +17,8 @@ public class Report {
         return ++count;
     }
 
-    public String getTag() {
-        return tag;
+    public String getPatternString() {
+        return patternString;
     }
 
     public void setError(String errorMessage) {
@@ -29,8 +29,8 @@ public class Report {
     @Override
     public String toString() {
         if (error != null) {
-            return tag + ": ОШИБКА - " + error;
+            return patternString + ": ОШИБКА - " + error;
         }
-        return tag + ": " + count;
+        return patternString + ": " + count;
     }
 }
